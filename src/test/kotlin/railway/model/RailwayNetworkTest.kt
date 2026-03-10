@@ -1,8 +1,8 @@
 package railway.model
 
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.maps.shouldContainKey
+import io.kotest.matchers.shouldBe
 
 class RailwayNetworkTest : FunSpec({
     val network = RailwayNetwork(

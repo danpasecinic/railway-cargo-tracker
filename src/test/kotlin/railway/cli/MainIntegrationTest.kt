@@ -1,11 +1,11 @@
 package railway.cli
 
+import com.github.ajalt.clikt.core.CliktError
+import com.github.ajalt.clikt.core.parse
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.kotest.assertions.throwables.shouldThrow
-import com.github.ajalt.clikt.core.CliktError
-import com.github.ajalt.clikt.core.parse
 import java.io.File
 
 class MainIntegrationTest : FunSpec({
@@ -22,7 +22,8 @@ class MainIntegrationTest : FunSpec({
     }
 
     test("end-to-end: linear chain from file") {
-        val inputFile = tempFile("""
+        val inputFile = tempFile(
+            """
             3 2
             1 0 10
             2 10 20
@@ -30,7 +31,8 @@ class MainIntegrationTest : FunSpec({
             1 2
             2 3
             1
-        """.trimIndent())
+        """.trimIndent()
+        )
         val outputFile = tempFile()
 
         runTracker(inputFile.absolutePath, outputFile.absolutePath)
@@ -43,7 +45,8 @@ class MainIntegrationTest : FunSpec({
     }
 
     test("end-to-end: cycle with cargo accumulation from file") {
-        val inputFile = tempFile("""
+        val inputFile = tempFile(
+            """
             3 3
             1 0 10
             2 0 20
@@ -52,7 +55,8 @@ class MainIntegrationTest : FunSpec({
             2 3
             3 2
             1
-        """.trimIndent())
+        """.trimIndent()
+        )
         val outputFile = tempFile()
 
         runTracker(inputFile.absolutePath, outputFile.absolutePath)
@@ -65,12 +69,14 @@ class MainIntegrationTest : FunSpec({
     }
 
     test("validation error throws CliktError") {
-        val inputFile = tempFile("""
+        val inputFile = tempFile(
+            """
             1 1
             1 0 10
             1 99
             1
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         val error = shouldThrow<CliktError> {
             runTracker(inputFile.absolutePath)
