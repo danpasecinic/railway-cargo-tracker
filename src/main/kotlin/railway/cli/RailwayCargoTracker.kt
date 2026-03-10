@@ -9,27 +9,30 @@ import railway.solver.CargoSolver
 import railway.validation.InputValidator
 import java.io.File
 
-class RailwayCargoTracker : CliktCommand(
-    name = "railway-cargo-tracker"
-) {
+class RailwayCargoTracker :
+    CliktCommand(
+        name = "railway-cargo-tracker",
+    ) {
     private val inputPath by option("--input", help = "Input file path (default: stdin)")
     private val outputPath by option("--output", help = "Output file path (default: stdout)")
 
     override fun run() {
-        val input = try {
-            when (val path = inputPath) {
-                null -> generateSequence(::readLine).joinToString("\n")
-                else -> File(path).readText()
+        val input =
+            try {
+                when (val path = inputPath) {
+                    null -> generateSequence(::readLine).joinToString("\n")
+                    else -> File(path).readText()
+                }
+            } catch (e: Exception) {
+                throw CliktError("Cannot read input file: ${e.message}")
             }
-        } catch (e: Exception) {
-            throw CliktError("Cannot read input file: ${e.message}")
-        }
 
-        val network = try {
-            InputParser.parse(input)
-        } catch (e: Exception) {
-            throw CliktError("Invalid input: ${e.message}")
-        }
+        val network =
+            try {
+                InputParser.parse(input)
+            } catch (e: Exception) {
+                throw CliktError("Invalid input: ${e.message}")
+            }
 
         val errors = InputValidator.validate(network)
         if (errors.isNotEmpty()) {

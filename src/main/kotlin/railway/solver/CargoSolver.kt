@@ -4,7 +4,10 @@ import railway.model.RailwayNetwork
 
 object CargoSolver {
     fun solve(network: RailwayNetwork): Map<Int, Set<Int>> {
-        val arrivingSets = network.stations.keys.associateWith { mutableSetOf<Int>() }.toMutableMap()
+        val arrivingSets =
+            network.stations.keys
+                .associateWith { mutableSetOf<Int>() }
+                .toMutableMap()
 
         val startStation = network.stations[network.startStation] ?: return arrivingSets
 

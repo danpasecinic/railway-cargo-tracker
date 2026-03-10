@@ -13,24 +13,26 @@ object InputParser {
         val stationCount = tokens.next()
         val trackCount = tokens.next()
 
-        val stations = buildMap {
-            repeat(stationCount) {
-                val id = tokens.next()
-                require(id !in this) { "Duplicate station ID: $id" }
-                put(id, Station(id = id, unloadCargo = tokens.next(), loadCargo = tokens.next()))
+        val stations =
+            buildMap {
+                repeat(stationCount) {
+                    val id = tokens.next()
+                    require(id !in this) { "Duplicate station ID: $id" }
+                    put(id, Station(id = id, unloadCargo = tokens.next(), loadCargo = tokens.next()))
+                }
             }
-        }
 
         val tracks = List(trackCount) { Track(from = tokens.next(), to = tokens.next()) }
 
-        val adjacency = tracks
-            .groupBy { it.from }
-            .mapValues { (_, v) -> v.map { it.to } }
+        val adjacency =
+            tracks
+                .groupBy { it.from }
+                .mapValues { (_, v) -> v.map { it.to } }
 
         return RailwayNetwork(
             stations = stations,
             adjacency = adjacency,
-            startStation = tokens.next()
+            startStation = tokens.next(),
         )
     }
 
