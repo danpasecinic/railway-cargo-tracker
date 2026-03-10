@@ -50,6 +50,14 @@ Station 3: []
 
 One line per station (sorted by id), listing possible arriving cargo types (sorted ascending).
 
+## Examples
+
+See `examples/` for sample input files: linear chain, cycle, branching, and diamond topologies.
+
+```bash
+./build/install/railway-cargo-tracker/bin/railway-cargo-tracker --input examples/diamond.txt
+```
+
 ## Build
 
 ```bash
