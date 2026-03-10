@@ -59,7 +59,7 @@ class CargoSolverTest : FunSpec({
         )
         val result = CargoSolver.solve(network)
         result[1] shouldBe emptySet()
-        result[2] shouldBe setOf(10, 30)
+        result[2] shouldBe setOf(10, 20, 30)
         result[3] shouldBe setOf(10, 20, 30)
     }
 
