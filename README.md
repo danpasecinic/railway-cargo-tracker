@@ -8,6 +8,10 @@ A railway system consists of stations connected by one-way tracks. Each station 
 
 Given the network, determine for each station which cargo types might be on a train when it arrives.
 
+## Algorithm
+
+<img width="1451" height="2270" alt="image" src="https://github.com/user-attachments/assets/cb87d430-e272-493a-a03e-d1327e29c1e2" />
+
 ## Usage
 
 ```bash
