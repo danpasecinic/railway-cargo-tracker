@@ -7,7 +7,7 @@ group = "railway"
 version = "1.0.0"
 
 application {
-    mainClass.set("railway.cli.MainKt")
+    mainClass.set("railway.cli.AppKt")
 }
 
 repositories {
