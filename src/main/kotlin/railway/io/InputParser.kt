@@ -1,7 +1,9 @@
 package railway.io
 
+import railway.model.CargoType
 import railway.model.RailwayNetwork
 import railway.model.Station
+import railway.model.StationId
 import railway.model.Track
 import java.io.StreamTokenizer
 import java.io.StringReader
@@ -16,13 +18,20 @@ object InputParser {
         val stations =
             buildMap {
                 repeat(stationCount) {
-                    val id = tokens.next()
+                    val id = StationId(tokens.next())
                     require(id !in this) { "Duplicate station ID: $id" }
-                    put(id, Station(id = id, unloadCargo = tokens.next(), loadCargo = tokens.next()))
+                    put(
+                        id,
+                        Station(
+                            id = id,
+                            unloadCargo = CargoType(tokens.next()),
+                            loadCargo = CargoType(tokens.next()),
+                        ),
+                    )
                 }
             }
 
-        val tracks = List(trackCount) { Track(from = tokens.next(), to = tokens.next()) }
+        val tracks = List(trackCount) { Track(from = StationId(tokens.next()), to = StationId(tokens.next())) }
 
         val adjacency =
             tracks
@@ -32,7 +41,7 @@ object InputParser {
         return RailwayNetwork(
             stations = stations,
             adjacency = adjacency,
-            startStation = tokens.next(),
+            startStation = StationId(tokens.next()),
         )
     }
 

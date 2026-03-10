@@ -1,7 +1,7 @@
 package railway.model
 
 data class Station(
-    val id: Int,
-    val unloadCargo: Int,
-    val loadCargo: Int,
+    val id: StationId,
+    val unloadCargo: CargoType,
+    val loadCargo: CargoType,
 )

@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 class TrackTest :
     FunSpec({
         test("track holds from and to station IDs") {
-            val track = Track(from = 1, to = 2)
-            track.from shouldBe 1
-            track.to shouldBe 2
+            val track = Track(from = StationId(1), to = StationId(2))
+            track.from shouldBe StationId(1)
+            track.to shouldBe StationId(2)
         }
     })

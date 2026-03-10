@@ -16,10 +16,10 @@ object InputValidator {
                 .forEach { add("Station $it referenced in track but not defined") }
 
             for (station in network.stations.values) {
-                if (station.unloadCargo < 0) {
+                if (station.unloadCargo.value < 0) {
                     add("Station ${station.id} has negative cargo type: unloadCargo=${station.unloadCargo}")
                 }
-                if (station.loadCargo < 0) {
+                if (station.loadCargo.value < 0) {
                     add("Station ${station.id} has negative cargo type: loadCargo=${station.loadCargo}")
                 }
             }

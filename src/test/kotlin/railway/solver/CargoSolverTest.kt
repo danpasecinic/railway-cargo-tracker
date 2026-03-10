@@ -2,20 +2,26 @@ package railway.solver
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import railway.model.CargoType
 import railway.model.RailwayNetwork
 import railway.model.Station
+import railway.model.StationId
+
+private fun sid(v: Int) = StationId(v)
+
+private fun ct(v: Int) = CargoType(v)
 
 class CargoSolverTest :
     FunSpec({
         test("single station with no outgoing tracks") {
             val network =
                 RailwayNetwork(
-                    stations = mapOf(1 to Station(1, 0, 1)),
+                    stations = mapOf(sid(1) to Station(sid(1), ct(0), ct(1))),
                     adjacency = emptyMap(),
-                    startStation = 1,
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[1] shouldBe emptySet()
+            result[sid(1)] shouldBe emptySet()
         }
 
         test("linear chain: start -> A -> B") {
@@ -23,17 +29,17 @@ class CargoSolverTest :
                 RailwayNetwork(
                     stations =
                         mapOf(
-                            1 to Station(1, 0, 10),
-                            2 to Station(2, 10, 20),
-                            3 to Station(3, 20, 30),
+                            sid(1) to Station(sid(1), ct(0), ct(10)),
+                            sid(2) to Station(sid(2), ct(10), ct(20)),
+                            sid(3) to Station(sid(3), ct(20), ct(30)),
                         ),
-                    adjacency = mapOf(1 to listOf(2), 2 to listOf(3)),
-                    startStation = 1,
+                    adjacency = mapOf(sid(1) to listOf(sid(2)), sid(2) to listOf(sid(3))),
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[1] shouldBe emptySet()
-            result[2] shouldBe setOf(10)
-            result[3] shouldBe setOf(20)
+            result[sid(1)] shouldBe emptySet()
+            result[sid(2)] shouldBe setOf(ct(10))
+            result[sid(3)] shouldBe setOf(ct(20))
         }
 
         test("branching: start -> A and start -> B") {
@@ -41,16 +47,16 @@ class CargoSolverTest :
                 RailwayNetwork(
                     stations =
                         mapOf(
-                            1 to Station(1, 0, 10),
-                            2 to Station(2, 10, 20),
-                            3 to Station(3, 10, 30),
+                            sid(1) to Station(sid(1), ct(0), ct(10)),
+                            sid(2) to Station(sid(2), ct(10), ct(20)),
+                            sid(3) to Station(sid(3), ct(10), ct(30)),
                         ),
-                    adjacency = mapOf(1 to listOf(2, 3)),
-                    startStation = 1,
+                    adjacency = mapOf(sid(1) to listOf(sid(2), sid(3))),
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[2] shouldBe setOf(10)
-            result[3] shouldBe setOf(10)
+            result[sid(2)] shouldBe setOf(ct(10))
+            result[sid(3)] shouldBe setOf(ct(10))
         }
 
         test("cycle accumulates cargo") {
@@ -58,17 +64,22 @@ class CargoSolverTest :
                 RailwayNetwork(
                     stations =
                         mapOf(
-                            1 to Station(1, 0, 10),
-                            2 to Station(2, 0, 20),
-                            3 to Station(3, 0, 30),
+                            sid(1) to Station(sid(1), ct(0), ct(10)),
+                            sid(2) to Station(sid(2), ct(0), ct(20)),
+                            sid(3) to Station(sid(3), ct(0), ct(30)),
                         ),
-                    adjacency = mapOf(1 to listOf(2), 2 to listOf(3), 3 to listOf(2)),
-                    startStation = 1,
+                    adjacency =
+                        mapOf(
+                            sid(1) to listOf(sid(2)),
+                            sid(2) to listOf(sid(3)),
+                            sid(3) to listOf(sid(2)),
+                        ),
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[1] shouldBe emptySet()
-            result[2] shouldBe setOf(10, 20, 30)
-            result[3] shouldBe setOf(10, 20, 30)
+            result[sid(1)] shouldBe emptySet()
+            result[sid(2)] shouldBe setOf(ct(10), ct(20), ct(30))
+            result[sid(3)] shouldBe setOf(ct(10), ct(20), ct(30))
         }
 
         test("unloading removes cargo type from arriving set") {
@@ -76,15 +87,15 @@ class CargoSolverTest :
                 RailwayNetwork(
                     stations =
                         mapOf(
-                            1 to Station(1, 0, 10),
-                            2 to Station(2, 10, 20),
-                            3 to Station(3, 99, 30),
+                            sid(1) to Station(sid(1), ct(0), ct(10)),
+                            sid(2) to Station(sid(2), ct(10), ct(20)),
+                            sid(3) to Station(sid(3), ct(99), ct(30)),
                         ),
-                    adjacency = mapOf(1 to listOf(2), 2 to listOf(3)),
-                    startStation = 1,
+                    adjacency = mapOf(sid(1) to listOf(sid(2)), sid(2) to listOf(sid(3))),
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[3] shouldBe setOf(20)
+            result[sid(3)] shouldBe setOf(ct(20))
         }
 
         test("station loads and unloads same cargo type") {
@@ -92,14 +103,14 @@ class CargoSolverTest :
                 RailwayNetwork(
                     stations =
                         mapOf(
-                            1 to Station(1, 0, 10),
-                            2 to Station(2, 10, 10),
+                            sid(1) to Station(sid(1), ct(0), ct(10)),
+                            sid(2) to Station(sid(2), ct(10), ct(10)),
                         ),
-                    adjacency = mapOf(1 to listOf(2)),
-                    startStation = 1,
+                    adjacency = mapOf(sid(1) to listOf(sid(2))),
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[2] shouldBe setOf(10)
+            result[sid(2)] shouldBe setOf(ct(10))
         }
 
         test("unreachable station has empty cargo set") {
@@ -107,15 +118,15 @@ class CargoSolverTest :
                 RailwayNetwork(
                     stations =
                         mapOf(
-                            1 to Station(1, 0, 10),
-                            2 to Station(2, 0, 20),
-                            3 to Station(3, 0, 30),
+                            sid(1) to Station(sid(1), ct(0), ct(10)),
+                            sid(2) to Station(sid(2), ct(0), ct(20)),
+                            sid(3) to Station(sid(3), ct(0), ct(30)),
                         ),
-                    adjacency = mapOf(1 to listOf(2)),
-                    startStation = 1,
+                    adjacency = mapOf(sid(1) to listOf(sid(2))),
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[3] shouldBe emptySet()
+            result[sid(3)] shouldBe emptySet()
         }
 
         test("self-loop accumulates own cargo") {
@@ -123,14 +134,14 @@ class CargoSolverTest :
                 RailwayNetwork(
                     stations =
                         mapOf(
-                            1 to Station(1, 0, 10),
-                            2 to Station(2, 0, 20),
+                            sid(1) to Station(sid(1), ct(0), ct(10)),
+                            sid(2) to Station(sid(2), ct(0), ct(20)),
                         ),
-                    adjacency = mapOf(1 to listOf(2), 2 to listOf(2)),
-                    startStation = 1,
+                    adjacency = mapOf(sid(1) to listOf(sid(2)), sid(2) to listOf(sid(2))),
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[2] shouldBe setOf(10, 20)
+            result[sid(2)] shouldBe setOf(ct(10), ct(20))
         }
 
         test("duplicate tracks do not affect result") {
@@ -138,13 +149,13 @@ class CargoSolverTest :
                 RailwayNetwork(
                     stations =
                         mapOf(
-                            1 to Station(1, 0, 10),
-                            2 to Station(2, 0, 20),
+                            sid(1) to Station(sid(1), ct(0), ct(10)),
+                            sid(2) to Station(sid(2), ct(0), ct(20)),
                         ),
-                    adjacency = mapOf(1 to listOf(2, 2)),
-                    startStation = 1,
+                    adjacency = mapOf(sid(1) to listOf(sid(2), sid(2))),
+                    startStation = sid(1),
                 )
             val result = CargoSolver.solve(network)
-            result[2] shouldBe setOf(10)
+            result[sid(2)] shouldBe setOf(ct(10))
         }
     })

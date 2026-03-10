@@ -1,17 +1,19 @@
 package railway.solver
 
+import railway.model.CargoType
 import railway.model.RailwayNetwork
+import railway.model.StationId
 
 object CargoSolver {
-    fun solve(network: RailwayNetwork): Map<Int, Set<Int>> {
+    fun solve(network: RailwayNetwork): Map<StationId, Set<CargoType>> {
         val arrivingSets =
             network.stations.keys
-                .associateWith { mutableSetOf<Int>() }
+                .associateWith { mutableSetOf<CargoType>() }
                 .toMutableMap()
 
         val startStation = network.stations[network.startStation] ?: return arrivingSets
 
-        val worklist = ArrayDeque<Pair<Int, Set<Int>>>()
+        val worklist = ArrayDeque<Pair<StationId, Set<CargoType>>>()
         for (neighbor in network.neighbors(network.startStation)) {
             worklist.add(neighbor to setOf(startStation.loadCargo))
         }

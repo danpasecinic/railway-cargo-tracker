@@ -1,9 +1,9 @@
 package railway.model
 
 data class RailwayNetwork(
-    val stations: Map<Int, Station>,
-    val adjacency: Map<Int, List<Int>>,
-    val startStation: Int,
+    val stations: Map<StationId, Station>,
+    val adjacency: Map<StationId, List<StationId>>,
+    val startStation: StationId,
 ) {
-    fun neighbors(stationId: Int): List<Int> = adjacency[stationId].orEmpty()
+    fun neighbors(stationId: StationId): List<StationId> = adjacency[stationId].orEmpty()
 }

@@ -1,6 +1,6 @@
 package railway.model
 
 data class Track(
-    val from: Int,
-    val to: Int,
+    val from: StationId,
+    val to: StationId,
 )

@@ -3,7 +3,13 @@ package railway.io
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import railway.model.CargoType
 import railway.model.Station
+import railway.model.StationId
+
+private fun sid(v: Int) = StationId(v)
+
+private fun ct(v: Int) = CargoType(v)
 
 class InputParserTest :
     FunSpec({
@@ -22,12 +28,12 @@ class InputParserTest :
             val network = InputParser.parse(input)
 
             network.stations.size shouldBe 3
-            network.stations[1] shouldBe Station(1, 0, 1)
-            network.stations[2] shouldBe Station(2, 1, 2)
-            network.stations[3] shouldBe Station(3, 2, 3)
-            network.adjacency[1] shouldBe listOf(2)
-            network.adjacency[2] shouldBe listOf(3)
-            network.startStation shouldBe 1
+            network.stations[sid(1)] shouldBe Station(sid(1), ct(0), ct(1))
+            network.stations[sid(2)] shouldBe Station(sid(2), ct(1), ct(2))
+            network.stations[sid(3)] shouldBe Station(sid(3), ct(2), ct(3))
+            network.adjacency[sid(1)] shouldBe listOf(sid(2))
+            network.adjacency[sid(2)] shouldBe listOf(sid(3))
+            network.startStation shouldBe sid(1)
         }
 
         test("parses input with multiple outgoing tracks from same station") {
@@ -42,7 +48,7 @@ class InputParserTest :
                 """.trimIndent()
 
             val network = InputParser.parse(input)
-            network.adjacency[1] shouldBe listOf(2, 2)
+            network.adjacency[sid(1)] shouldBe listOf(sid(2), sid(2))
         }
 
         test("parses input with no tracks") {
@@ -56,7 +62,7 @@ class InputParserTest :
             val network = InputParser.parse(input)
             network.stations.size shouldBe 1
             network.adjacency shouldBe emptyMap()
-            network.startStation shouldBe 1
+            network.startStation shouldBe sid(1)
         }
 
         test("throws on station count mismatch") {
@@ -105,6 +111,6 @@ class InputParserTest :
             val network = InputParser.parse(input)
             network.stations shouldBe emptyMap()
             network.adjacency shouldBe emptyMap()
-            network.startStation shouldBe 1
+            network.startStation shouldBe sid(1)
         }
     })
