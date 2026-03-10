@@ -3,30 +3,24 @@ package railway.validation
 import railway.model.RailwayNetwork
 
 object InputValidator {
-    fun validate(network: RailwayNetwork): List<String> {
-        val errors = mutableListOf<String>()
-
+    fun validate(network: RailwayNetwork): List<String> = buildList {
         if (network.startStation !in network.stations) {
-            errors.add("Start station ${network.startStation} does not exist")
+            add("Start station ${network.startStation} does not exist")
         }
 
-        val allReferencedStations = network.adjacency.entries.flatMap { (from, toList) ->
-            listOf(from) + toList
-        }.toSet()
+        val referencedStations = network.adjacency.flatMap { (from, toList) -> toList + from }.toSet()
 
-        allReferencedStations
+        referencedStations
             .filter { it !in network.stations }
-            .forEach { errors.add("Station $it referenced in track but not defined") }
+            .forEach { add("Station $it referenced in track but not defined") }
 
-        network.stations.values.forEach { station ->
+        for (station in network.stations.values) {
             if (station.unloadCargo < 0) {
-                errors.add("Station ${station.id} has negative cargo type: unloadCargo=${station.unloadCargo}")
+                add("Station ${station.id} has negative cargo type: unloadCargo=${station.unloadCargo}")
             }
             if (station.loadCargo < 0) {
-                errors.add("Station ${station.id} has negative cargo type: loadCargo=${station.loadCargo}")
+                add("Station ${station.id} has negative cargo type: loadCargo=${station.loadCargo}")
             }
         }
-
-        return errors
     }
 }

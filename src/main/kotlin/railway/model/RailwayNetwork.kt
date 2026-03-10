@@ -5,5 +5,5 @@ data class RailwayNetwork(
     val adjacency: Map<Int, List<Int>>,
     val startStation: Int
 ) {
-    fun neighbors(stationId: Int): List<Int> = adjacency.getOrDefault(stationId, emptyList())
+    fun neighbors(stationId: Int): List<Int> = adjacency[stationId].orEmpty()
 }

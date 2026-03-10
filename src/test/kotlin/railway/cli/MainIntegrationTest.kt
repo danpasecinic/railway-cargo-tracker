@@ -9,24 +9,31 @@ import com.github.ajalt.clikt.core.parse
 import java.io.File
 
 class MainIntegrationTest : FunSpec({
-    test("end-to-end: linear chain from file") {
-        val inputFile = File.createTempFile("input", ".txt").apply {
+    fun tempFile(content: String? = null): File =
+        File.createTempFile("railway-test", ".txt").apply {
             deleteOnExit()
-            writeText("""
-                3 2
-                1 0 10
-                2 10 20
-                3 20 30
-                1 2
-                2 3
-                1
-            """.trimIndent())
-        }
-        val outputFile = File.createTempFile("output", ".txt").apply {
-            deleteOnExit()
+            if (content != null) writeText(content)
         }
 
-        RailwayCargoTracker().parse(arrayOf("--input", inputFile.absolutePath, "--output", outputFile.absolutePath))
+    fun runTracker(inputPath: String, outputPath: String? = null) {
+        val args = mutableListOf("--input", inputPath)
+        if (outputPath != null) args += listOf("--output", outputPath)
+        RailwayCargoTracker().parse(args.toTypedArray())
+    }
+
+    test("end-to-end: linear chain from file") {
+        val inputFile = tempFile("""
+            3 2
+            1 0 10
+            2 10 20
+            3 20 30
+            1 2
+            2 3
+            1
+        """.trimIndent())
+        val outputFile = tempFile()
+
+        runTracker(inputFile.absolutePath, outputFile.absolutePath)
 
         outputFile.readText().trim() shouldBe """
             Station 1: []
@@ -36,24 +43,19 @@ class MainIntegrationTest : FunSpec({
     }
 
     test("end-to-end: cycle with cargo accumulation from file") {
-        val inputFile = File.createTempFile("input", ".txt").apply {
-            deleteOnExit()
-            writeText("""
-                3 3
-                1 0 10
-                2 0 20
-                3 0 30
-                1 2
-                2 3
-                3 2
-                1
-            """.trimIndent())
-        }
-        val outputFile = File.createTempFile("output", ".txt").apply {
-            deleteOnExit()
-        }
+        val inputFile = tempFile("""
+            3 3
+            1 0 10
+            2 0 20
+            3 0 30
+            1 2
+            2 3
+            3 2
+            1
+        """.trimIndent())
+        val outputFile = tempFile()
 
-        RailwayCargoTracker().parse(arrayOf("--input", inputFile.absolutePath, "--output", outputFile.absolutePath))
+        runTracker(inputFile.absolutePath, outputFile.absolutePath)
 
         outputFile.readText().trim() shouldBe """
             Station 1: []
@@ -63,25 +65,22 @@ class MainIntegrationTest : FunSpec({
     }
 
     test("validation error throws CliktError") {
-        val inputFile = File.createTempFile("input", ".txt").apply {
-            deleteOnExit()
-            writeText("""
-                1 1
-                1 0 10
-                1 99
-                1
-            """.trimIndent())
-        }
+        val inputFile = tempFile("""
+            1 1
+            1 0 10
+            1 99
+            1
+        """.trimIndent())
 
         val error = shouldThrow<CliktError> {
-            RailwayCargoTracker().parse(arrayOf("--input", inputFile.absolutePath))
+            runTracker(inputFile.absolutePath)
         }
         error.message shouldContain "referenced in track but not defined"
     }
 
     test("file not found throws CliktError") {
         val error = shouldThrow<CliktError> {
-            RailwayCargoTracker().parse(arrayOf("--input", "/nonexistent/file.txt"))
+            runTracker("/nonexistent/file.txt")
         }
         error.message shouldContain "Cannot read input file"
     }

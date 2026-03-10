@@ -1,7 +1,6 @@
 package railway.solver
 
 import railway.model.RailwayNetwork
-import java.util.LinkedList
 
 object CargoSolver {
     fun solve(network: RailwayNetwork): Map<Int, Set<Int>> {
@@ -9,15 +8,13 @@ object CargoSolver {
 
         val startStation = network.stations[network.startStation] ?: return arrivingSets
 
-        val startDeparting = setOf(startStation.loadCargo)
-
-        val worklist = LinkedList<Pair<Int, Set<Int>>>()
+        val worklist = ArrayDeque<Pair<Int, Set<Int>>>()
         for (neighbor in network.neighbors(network.startStation)) {
-            worklist.add(neighbor to startDeparting)
+            worklist.add(neighbor to setOf(startStation.loadCargo))
         }
 
         while (worklist.isNotEmpty()) {
-            val (stationId, incomingCargo) = worklist.poll()
+            val (stationId, incomingCargo) = worklist.removeFirst()
             val arriving = arrivingSets.getValue(stationId)
             val newCargo = incomingCargo - arriving
 
