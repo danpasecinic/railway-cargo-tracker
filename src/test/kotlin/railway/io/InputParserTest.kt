@@ -86,4 +86,25 @@ class InputParserTest :
                 InputParser.parse(input)
             }
         }
+
+        test("throws on non-numeric input") {
+            val input = "abc"
+
+            shouldThrow<IllegalArgumentException> {
+                InputParser.parse(input)
+            }
+        }
+
+        test("parses zero stations and zero tracks") {
+            val input =
+                """
+                0 0
+                1
+                """.trimIndent()
+
+            val network = InputParser.parse(input)
+            network.stations shouldBe emptyMap()
+            network.adjacency shouldBe emptyMap()
+            network.startStation shouldBe 1
+        }
     })

@@ -32,4 +32,10 @@ class OutputFormatterTest :
             val result = OutputFormatter.format(state)
             result shouldBe "Station 1: []"
         }
+
+        test("formats single station with multiple cargo types sorted") {
+            val state = mapOf(1 to setOf(30, 5, 20, 10))
+            val result = OutputFormatter.format(state)
+            result shouldBe "Station 1: [5, 10, 20, 30]"
+        }
     })

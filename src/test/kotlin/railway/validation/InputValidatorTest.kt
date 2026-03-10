@@ -3,6 +3,7 @@ package railway.validation
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.shouldBe
 import railway.model.RailwayNetwork
 import railway.model.Station
 
@@ -49,5 +50,27 @@ class InputValidatorTest :
                 )
             val errors = InputValidator.validate(network)
             errors shouldContain "Station 1 has negative cargo type: unloadCargo=-1"
+        }
+
+        test("reports error for negative load cargo type") {
+            val network =
+                RailwayNetwork(
+                    stations = mapOf(1 to Station(1, 0, -5)),
+                    adjacency = emptyMap(),
+                    startStation = 1,
+                )
+            val errors = InputValidator.validate(network)
+            errors shouldContain "Station 1 has negative cargo type: loadCargo=-5"
+        }
+
+        test("reports multiple errors at once") {
+            val network =
+                RailwayNetwork(
+                    stations = mapOf(1 to Station(1, -1, -2)),
+                    adjacency = mapOf(1 to listOf(99)),
+                    startStation = 88,
+                )
+            val errors = InputValidator.validate(network)
+            errors.size shouldBe 4
         }
     })
